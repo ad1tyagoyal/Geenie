@@ -1,0 +1,40 @@
+# Geenie Trading Bot Configuration
+
+# Data Pipeline Settings
+data_pipeline:
+  source: "yfinance"  # Options: yfinance, websocket
+  data_type: "EOD"    # Options: EOD, intraday
+  cache_dir: "./data"
+
+# Strategy Settings
+strategy:
+  type: "mean_reversion"  # Strategy type to use
+  parameters:
+    period: 20
+    threshold: 2.0
+
+# Backtesting Settings
+backtesting:
+  initial_capital: 100000
+  commission: 0.001
+  slippage: 0.0001
+  start_date: "2020-01-01"
+  end_date: "2023-12-31"
+
+# Risk Management Settings
+risk_management:
+  risk_per_trade: 0.02  # 2% risk per trade
+  max_positions: 5
+  max_daily_loss: 0.05  # 5% max daily drawdown
+
+# Broker Settings (for live trading)
+broker:
+  type: "zerodha"  # Options: zerodha, alpaca
+  api_key: "YOUR_API_KEY"
+  api_secret: "YOUR_API_SECRET"
+  mode: "backtest"  # Options: backtest, paper, live
+
+# Logging Settings
+logging:
+  level: "INFO"
+  file: "./logs/geenie.log"
