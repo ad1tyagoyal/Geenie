@@ -3,7 +3,7 @@
 # Detect OS for cross-platform compatibility (Windows vs Unix/macOS)
 ifeq ($(OS),Windows_NT)
 	VENV_DIR := .venv
-	PYTHON := $(VENV_DIR)/Scripts/python.exe
+	PYTHON := $(VENV_DIR)\Scripts\python.exe
 else
 	VENV_DIR := .venv
 	PYTHON := $(VENV_DIR)/bin/python
@@ -21,7 +21,7 @@ help: ## Show available commands
 	@echo   make install      - Install dependencies from requirements.txt
 	@echo   make install-dev  - Install dev tools (pytest, ruff, black)
 	@echo   make run          - Run data pipeline ingestion
-	@echo   make test         - Run test suite with pytest
+	@echo   make test         - Run all unit tests (unittest)
 	@echo   make lint         - Run linter (ruff)
 	@echo   make format       - Format code (ruff format)
 	@echo   make clean        - Remove Python cache files (__pycache__, .pyc)
@@ -39,8 +39,8 @@ install-dev: install ## Install development tools
 run: ## Run main / sample script
 	$(PYTHON) -m data_pipeline.ingestion.twelve_data_client
 
-test: ## Run unit tests
-	$(PYTHON) -m pytest
+test: ## Run all unit tests
+	$(PYTHON) -c "import pathlib, sys, unittest; mods = sorted(p.with_suffix('').as_posix().replace('/', '.') for p in pathlib.Path('test').rglob('*.py') if p.name != '__init__.py'); suite = unittest.defaultTestLoader.loadTestsFromNames(mods); res = unittest.TextTestRunner(verbosity=2).run(suite); sys.exit(0 if res.wasSuccessful() else 1)"
 
 lint: ## Check code for errors and styling
 	$(PYTHON) -m ruff check .

@@ -14,20 +14,12 @@ if __package__ in (None, ""):
 
 from IO.adapters.csv_adapter import CSVAdapter
 from utils.constants import Index
+from utils.helpers import DEFAULT_DATA_DIR, index_slug, normalize_index_name
 
 NSE_INDEX_CONSTITUENTS_URL = (
     "https://www.nseindia.com/api/NextApi/apiClient/marketWatchApi"
     "?functionName=getIndicesData&symbol={symbol}"
 )
-DEFAULT_OUTPUT_DIR = Path("data/raw")
-
-
-def _normalize_index_name(index_name: str | Index) -> str:
-    raw_name = index_name.value if isinstance(index_name, Index) else str(index_name)
-    normalized = raw_name.strip().upper()
-    if not normalized:
-        raise ValueError("index_name must be a non-empty NSE index name")
-    return normalized
 
 
 def _extract_constituent_rows(
@@ -66,7 +58,7 @@ def fetch_nifty_constituents(index_name: str | Index) -> pl.DataFrame:
     Raises:
         ValueError: If ``index_name`` is empty or NSE returns no constituents.
     """
-    normalized_index = _normalize_index_name(index_name)
+    normalized_index = normalize_index_name(index_name)
     url = NSE_INDEX_CONSTITUENTS_URL.format(symbol=quote(normalized_index))
     payload = nsefetch(url)
 
@@ -77,9 +69,8 @@ def fetch_nifty_constituents(index_name: str | Index) -> pl.DataFrame:
     return pl.DataFrame(rows, infer_schema_length=None)
 
 
-def _default_output_path(index_name: str) -> Path:
-    slug = "_".join(index_name.lower().split())
-    return DEFAULT_OUTPUT_DIR / f"{slug}_constituents.csv"
+def _default_output_path(index_name: str | Index) -> Path:
+    return DEFAULT_DATA_DIR / f"{index_slug(index_name)}_constituents.csv"
 
 
 def main(
@@ -88,8 +79,7 @@ def main(
 ) -> Path:
     """Fetch index constituents into a Polars DataFrame and write them to CSV."""
     df: pl.DataFrame = fetch_nifty_constituents(index_name)
-    normalized_index = _normalize_index_name(index_name)
-    target_path = Path(output_path) if output_path is not None else _default_output_path(normalized_index)
+    target_path = Path(output_path) if output_path is not None else _default_output_path(index_name)
     return CSVAdapter().write(df, target_path)
 
 
