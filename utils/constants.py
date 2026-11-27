@@ -1,10 +1,4 @@
 from enum import Enum
-from types import MappingProxyType
-
-MappingProxyType({
-
-})
-
 
 class Index(str, Enum):
     NIFTY_50  = "NIFTY 50"
