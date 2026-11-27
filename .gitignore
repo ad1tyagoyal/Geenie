@@ -1,2 +1,16 @@
 .env
 *.env.local
+
+# Byte-compiled / caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+
+# Fetched / generated data
+data/
+
